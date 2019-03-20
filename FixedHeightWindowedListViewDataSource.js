@@ -259,7 +259,7 @@ class FixedHeightListViewDataSource {
     if (relativeY <= parentSection.sectionHeaderHeight) {
       return parentSection.range[0];
     } else {
-      let i = Math.floor(
+      let i = Math.round(
         (relativeY - parentSection.sectionHeaderHeight) /
         parentSection.cellHeight
       );
