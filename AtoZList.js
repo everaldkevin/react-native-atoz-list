@@ -25,7 +25,6 @@ import _ from 'lodash';
 import FixedHeightWindowedListView from './FixedHeightWindowedListView';
 import AlphabetPicker from './AlphabetPicker';
 
-
 export default class AtoZList extends Component {
   static propTypes = {
     sectionHeaderHeight: PropTypes.number.isRequired,
@@ -44,25 +43,24 @@ export default class AtoZList extends Component {
     let cellHeight = props.cellHeight || 95;
 
     var dataSource = new FixedHeightWindowedListView.DataSource({
-      getHeightForSectionHeader: (sectionId) => {
+      getHeightForSectionHeader: sectionId => {
         return sectionHeight;
       },
-      getHeightForCell: (sectionId) => {
+      getHeightForCell: sectionId => {
         return cellHeight;
-      }
+      },
     });
 
     this.state = {
       dataSource: dataSource.cloneWithCellsAndSections(this.props.data),
-      alphabet: Object.keys(this.props.data)
+      alphabet: Object.keys(this.props.data),
     };
 
     this.dataSource = dataSource;
   }
 
-
   componentWillReceiveProps(nextProps) {
-	if (
+    if (
       this.props.cellHeight !== nextProps.cellHeight ||
       this.props.sectionHeaderHeight !== nextProps.sectionHeaderHeight
     ) {
@@ -76,36 +74,42 @@ export default class AtoZList extends Component {
       });
     }
 
-    if(this.props.data !== nextProps.data){
+    if (this.props.data !== nextProps.data) {
       this.setState({
         dataSource: this.dataSource.cloneWithCellsAndSections(nextProps.data),
-        alphabet: Object.keys(nextProps.data)
+        alphabet: Object.keys(nextProps.data),
+      });
+    } else {
+      this.setState({
+        dataSource: this.dataSource.cloneWithCellsAndSections(this.props.data),
       });
     }
   }
 
-
   render() {
     this._alphabetInstance = (
       <View style={styles.alphabetSidebar}>
-        <AlphabetPicker alphabet={this.state.alphabet} onTouchLetter={this._onTouchLetter.bind(this)} />
+        <AlphabetPicker
+          alphabet={this.state.alphabet}
+          onTouchLetter={this._onTouchLetter.bind(this)}
+        />
       </View>
     );
 
     return (
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <View style={styles.container}>
           <FixedHeightWindowedListView
-            ref={view => this._listView = view}
+            ref={view => (this._listView = view)}
             dataSource={this.state.dataSource}
             renderCell={this.props.renderCell}
             renderSectionHeader={this.props.renderSection}
-            incrementDelay={1}
-            initialNumToRender={12}
-            pageSize={Platform.OS === 'ios' ? 14 : 10}
-            maxNumToRender={80}
-            numToRenderAhead={60}
-            numToRenderBehind={30}
+            incrementDelay={16}
+            initialNumToRender={8}
+            pageSize={Platform.OS === 'ios' ? 15 : 8}
+            maxNumToRender={70}
+            numToRenderAhead={40}
+            numToRenderBehind={4}
             onEndReached={this.props.onEndReached}
             onScroll={this.props.onScroll}
           />
@@ -115,13 +119,10 @@ export default class AtoZList extends Component {
     );
   }
 
-  _onTouchLetter(letter) {
+  _onTouchLetter = _.debounce(letter => {
     this._listView.scrollToSectionBuffered(letter);
-  }
+  }, 150);
 }
-
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -139,4 +140,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-

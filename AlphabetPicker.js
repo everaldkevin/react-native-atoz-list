@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, PanResponder } from 'react-native';
 import PropTypes from 'prop-types';
-import debounce from 'lodash/debounce';
 
 class LetterPicker extends Component {
   render() {
@@ -79,7 +78,7 @@ export default class AlphabetPicker extends Component {
   _onPanResponderEnd() {
     setTimeout(() => {
       this.setState({ currentLetter: null });
-    }, 300);
+    }, 150);
 
     requestAnimationFrame(() => {
       this.props.onTouchEnd && this.props.onTouchEnd();

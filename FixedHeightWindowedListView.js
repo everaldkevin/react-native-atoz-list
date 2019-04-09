@@ -3,15 +3,9 @@
  */
 'use strict';
 
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Platform,
-  ScrollView,
-  Text,
-  View,
-  Dimensions,
-} from 'react-native';
+import { Platform, ScrollView, Text, View, Dimensions } from 'react-native';
 
 import FixedHeightWindowedListViewDataSource from './FixedHeightWindowedListViewDataSource';
 import clamp from './clamp';
@@ -33,7 +27,6 @@ import _ from 'lodash';
  * of the rows can vary depending on the section that they are in.
  */
 export default class FixedHeightWindowedListView extends Component {
-
   constructor(props, context) {
     super(props, context);
 
@@ -83,7 +76,7 @@ export default class FixedHeightWindowedListView extends Component {
     let { spacerTopHeight, spacerBottomHeight, spacerMidHeight } = this.__calculateSpacers();
 
     let rows = [];
-    rows.push(<View key="sp-top" style={{height: spacerTopHeight}} />);
+    rows.push(<View key="sp-top" style={{ height: spacerTopHeight }} />);
 
     if (bufferFirstRow < firstRow && bufferFirstRow !== null) {
       bufferLastRow = clamp(0, bufferLastRow, firstRow - 1);
@@ -99,12 +92,12 @@ export default class FixedHeightWindowedListView extends Component {
     this.__renderCells(rows, firstRow, lastRow);
 
     if (bufferFirstRow > lastRow && bufferFirstRow !== null) {
-      rows.push(<View key="sp-mid" style={{height: spacerMidHeight}} />);
+      rows.push(<View key="sp-mid" style={{ height: spacerMidHeight }} />);
       this.__renderCells(rows, bufferFirstRow, bufferLastRow);
     }
 
     let totalRows = this.props.dataSource.getRowCount();
-    rows.push(<View key="sp-bot" style={{height: spacerBottomHeight}} />);
+    rows.push(<View key="sp-bot" style={{ height: spacerBottomHeight }} />);
 
     return (
       <ScrollView
@@ -112,17 +105,20 @@ export default class FixedHeightWindowedListView extends Component {
         removeClippedSubviews={this.props.numToRenderAhead === 0 ? false : true}
         automaticallyAdjustContentInsets={false}
         {...this.props}
-        ref={(ref) => { this.scrollRef = ref; }}
-        onScroll={this.__onScroll}>
+        ref={ref => {
+          this.scrollRef = ref;
+        }}
+        onScroll={this.__onScroll}
+      >
         {rows}
       </ScrollView>
     );
   }
 
   getScrollResponder() {
-    return this.scrollRef &&
-      this.scrollRef.getScrollResponder &&
-      this.scrollRef.getScrollResponder();
+    return (
+      this.scrollRef && this.scrollRef.getScrollResponder && this.scrollRef.getScrollResponder()
+    );
   }
 
   scrollToSectionBuffered(sectionId) {
@@ -145,42 +141,48 @@ export default class FixedHeightWindowedListView extends Component {
       }
 
       // Set up the buffer
-      this.setState({
-        bufferFirstRow: windowFirstRow,
-        bufferLastRow: windowLastRow,
-      }, () => {
-        this.__maybeWait(() => {
-          this.setState({
-            firstRow: windowFirstRow,
-            lastRow: windowLastRow,
-            bufferFirstRow: null,
-            bufferLastRow: null,
-          }, () => {
-            if (this.nextSectionToScrollTo !== null) {
-              requestAnimationFrame(() => {
-                let nextSectionID = this.nextSectionToScrollTo;
-                this.nextSectionToScrollTo = null;
-                this.isScrollingToSection = false;
-                this.scrollToSectionBuffered(nextSectionID);
-              });
-            } else {
-              // On Android it seems like it is possible for the scroll
-              // position to be reported incorrectly sometimes, so we
-              // delay setting isScrollingToSection to false here to
-              // give it more time for the scroll position to catch up (?)
-              // which is important for calculating the firstVisible and
-              // lastVisible, ultimately determining rows to render.
-              // Leaving this out sometimes causes a blank screen briefly,
-              // with the firstRow exceeding lastRow.
-              setTimeout(() => {
-                this.isScrollingToSection = false;
-                this.__clearEnqueuedComputation();
-                this.__enqueueComputeRowsToRender();
-              }, 100);
-            }
+      this.setState(
+        {
+          bufferFirstRow: windowFirstRow,
+          bufferLastRow: windowLastRow,
+        },
+        () => {
+          this.__maybeWait(() => {
+            this.setState(
+              {
+                firstRow: windowFirstRow,
+                lastRow: windowLastRow,
+                bufferFirstRow: null,
+                bufferLastRow: null,
+              },
+              () => {
+                if (this.nextSectionToScrollTo !== null) {
+                  requestAnimationFrame(() => {
+                    let nextSectionID = this.nextSectionToScrollTo;
+                    this.nextSectionToScrollTo = null;
+                    this.isScrollingToSection = false;
+                    this.scrollToSectionBuffered(nextSectionID);
+                  });
+                } else {
+                  // On Android it seems like it is possible for the scroll
+                  // position to be reported incorrectly sometimes, so we
+                  // delay setting isScrollingToSection to false here to
+                  // give it more time for the scroll position to catch up (?)
+                  // which is important for calculating the firstVisible and
+                  // lastVisible, ultimately determining rows to render.
+                  // Leaving this out sometimes causes a blank screen briefly,
+                  // with the firstRow exceeding lastRow.
+                  setTimeout(() => {
+                    this.isScrollingToSection = false;
+                    this.__clearEnqueuedComputation();
+                    this.__enqueueComputeRowsToRender();
+                  }, 100);
+                }
+              }
+            );
           });
-        });
-      });
+        }
+      );
 
       // Scroll to the buffer area as soon as setState is complete
       this.scrollRef.scrollTo({ y: startY, animated: false });
@@ -191,9 +193,7 @@ export default class FixedHeightWindowedListView extends Component {
   }
 
   scrollWithoutAnimationTo(destY, destX) {
-    this.scrollRef &&
-      this.scrollRef.scrollTo({ y: destY, x: destX, animated: false });
-
+    this.scrollRef && this.scrollRef.scrollTo({ y: destY, x: destX, animated: false });
   }
 
   // Android requires us to wait a frame between setting the buffer, scrolling
@@ -223,7 +223,7 @@ export default class FixedHeightWindowedListView extends Component {
       let key = id;
 
       if (!(data && _.isObject(data) && data.sectionId)) {
-        parentSectionId = this.props.dataSource.getSectionId(idx)
+        parentSectionId = this.props.dataSource.getSectionId(idx);
         key = `${key}-${id}`;
       }
 
@@ -259,7 +259,7 @@ export default class FixedHeightWindowedListView extends Component {
       const { height } = e.nativeEvent.contentSize;
       const offset = e.nativeEvent.contentOffset.y;
 
-      if( windowHeight + offset >= height ){
+      if (windowHeight + offset >= height) {
         // ScrollEnd
         this.props.onEndReached(e);
       }
@@ -299,7 +299,11 @@ export default class FixedHeightWindowedListView extends Component {
    * the viewport.
    */
   __computeRowsToRenderSync(props, forceUpdate = false) {
-    if (this.props.bufferFirstRow === 0 || this.props.bufferFirstRow > 0 || this.isScrollingToSection) {
+    if (
+      this.props.bufferFirstRow === 0 ||
+      this.props.bufferFirstRow > 0 ||
+      this.isScrollingToSection
+    ) {
       requestAnimationFrame(() => {
         this.__computeRowsToRenderSync(this.props);
       });
@@ -320,10 +324,10 @@ export default class FixedHeightWindowedListView extends Component {
 
     let { firstVisible, lastVisible } = dataSource.computeVisibleRows(
       this.scrollOffsetY,
-      this.height,
+      this.height
     );
 
-    if ((lastVisible >= totalRows - 1) && !forceUpdate) {
+    if (lastVisible >= totalRows - 1 && !forceUpdate) {
       return;
     }
 
@@ -342,7 +346,7 @@ export default class FixedHeightWindowedListView extends Component {
       totalRows,
     });
 
-    this.setState({firstRow, lastRow});
+    this.setState({ firstRow, lastRow });
 
     // Keep enqueuing updates until we reach the targetLastRow or
     // targetFirstRow
@@ -363,16 +367,16 @@ export default class FixedHeightWindowedListView extends Component {
     let spacerMidHeight;
 
     if (bufferFirstRow !== null && bufferFirstRow < firstRow) {
-      spacerMidHeight = this.props.dataSource.
-        getHeightBetweenRows(bufferLastRow, firstRow);
+      spacerMidHeight = this.props.dataSource.getHeightBetweenRows(bufferLastRow, firstRow);
 
-      let bufferHeight = this.props.dataSource.
-        getHeightBetweenRows(bufferFirstRow - 1, bufferLastRow + 1);
+      let bufferHeight = this.props.dataSource.getHeightBetweenRows(
+        bufferFirstRow - 1,
+        bufferLastRow + 1
+      );
 
-      spacerTopHeight -= (spacerMidHeight + bufferHeight);
+      spacerTopHeight -= spacerMidHeight + bufferHeight;
     } else if (bufferFirstRow !== null && bufferFirstRow > lastRow) {
-      spacerMidHeight = this.props.dataSource.
-        getHeightBetweenRows(lastRow, bufferFirstRow);
+      spacerMidHeight = this.props.dataSource.getHeightBetweenRows(lastRow, bufferFirstRow);
 
       spacerBottomHeight -= spacerMidHeight;
     }
@@ -381,7 +385,7 @@ export default class FixedHeightWindowedListView extends Component {
       spacerTopHeight,
       spacerBottomHeight,
       spacerMidHeight,
-    }
+    };
   }
 }
 
@@ -418,7 +422,7 @@ class CellRenderer extends React.Component {
   }
 
   render() {
-    return this.props.render()
+    return this.props.render();
   }
 }
 
