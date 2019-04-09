@@ -1,98 +1,171 @@
 import React, { Component } from 'react';
 import { View, Text, PanResponder } from 'react-native';
 import PropTypes from 'prop-types';
+import debounce from 'lodash/debounce';
 
 class LetterPicker extends Component {
-
-    render() {
-        return (
-            <Text style={{ fontSize: 11, fontWeight: 'bold' }}>
-                {this.props.letter}
-            </Text>
-        );
-    }
+  render() {
+    return <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{this.props.letter}</Text>;
+  }
 }
 
-let Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+let Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 export default class AlphabetPicker extends Component {
-    constructor(props, context) {
-        super(props, context);
-        if(props.alphabet){
-            Alphabet = props.alphabet;
-        }
-        this.state = {
-            alphabet: Alphabet,
-          };
+  constructor(props, context) {
+    super(props, context);
+    if (props.alphabet) {
+      Alphabet = props.alphabet;
     }
+    this.state = {
+      alphabet: Alphabet,
+      letter: null,
+      yPositiion: 0,
+    };
+  }
 
-    componentWillMount() {
-        this._panResponder = PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onMoveShouldSetPanResponder: () => true,
-            onPanResponderGrant: (e, gestureState) => {
-                this.props.onTouchStart && this.props.onTouchStart();
+  componentWillMount() {
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (e, gestureState) => {
+        this.props.onTouchStart && this.props.onTouchStart();
 
-                this.tapTimeout = setTimeout(() => {
-                    this._onTouchLetter(this._findTouchedLetter(gestureState.y0));
-                }, 100);
-            },
-            onPanResponderMove: (evt, gestureState) => {
-                clearTimeout(this.tapTimeout);
-                this._onTouchLetter(this._findTouchedLetter(gestureState.moveY));
-            },
-            onPanResponderTerminate: this._onPanResponderEnd.bind(this),
-            onPanResponderRelease: this._onPanResponderEnd.bind(this),
-        });
-    }
-    componentWillReceiveProps(nextProps) {
-        if(this.props.alphabet !== nextProps.alphabet){
-            this.setState({alphabet:nextProps.alphabet})
+        this.tapTimeout = setTimeout(() => {
+          const { alphabet } = this.state;
+
+          const letter = this._findTouchedLetter(gestureState.y0);
+
+          if (!!letter) {
+            let top = gestureState.y0 - (this.absContainerTop || 0);
+            top =
+              (Math.round((top / this.containerHeight) * alphabet.length) - 1) *
+              (this.containerHeight / alphabet.length);
+
+            this._onTouchLetter(letter);
+            this.setState({ currentLetter: letter, yPositiion: top });
           }
-      }
+        }, 250);
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        clearTimeout(this.tapTimeout);
 
-    _onTouchLetter(letter) {
-        letter && this.props.onTouchLetter && this.props.onTouchLetter(letter);
-    }
+        const { alphabet } = this.state;
 
-    _onPanResponderEnd() {
-        requestAnimationFrame(() => {
-            this.props.onTouchEnd && this.props.onTouchEnd();
-        });
-    }
+        const letter = this._findTouchedLetter(gestureState.moveY);
+        if (!!letter) {
+          let top = gestureState.moveY - (this.absContainerTop || 0);
+          top =
+            (Math.round((top / this.containerHeight) * alphabet.length) - 1) *
+            (this.containerHeight / alphabet.length);
 
-    _findTouchedLetter(y) {
-        let top = y - (this.absContainerTop || 0);
-        const {alphabet} = this.state
-
-        if (top >= 1 && top <= this.containerHeight) {
-            return alphabet[Math.round((top / this.containerHeight) * alphabet.length)]
+          this._onTouchLetter(letter);
+          this.setState({ currentLetter: letter, yPositiion: top });
         }
+      },
+      onPanResponderTerminate: this._onPanResponderEnd.bind(this),
+      onPanResponderRelease: this._onPanResponderEnd.bind(this),
+    });
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.props.alphabet !== nextProps.alphabet) {
+      this.setState({ alphabet: nextProps.alphabet });
     }
+  }
 
-    _onLayout(event) {
-        this.refs.alphabetContainer.measure((x1, y1, width, height, px, py) => {
-            this.absContainerTop = py;
-            this.containerHeight = height;
-        });
+  _onTouchLetter(letter) {
+    letter && this.props.onTouchLetter && this.props.onTouchLetter(letter);
+  }
+
+  _onPanResponderEnd() {
+    setTimeout(() => {
+      this.setState({ currentLetter: null });
+    }, 300);
+
+    requestAnimationFrame(() => {
+      this.props.onTouchEnd && this.props.onTouchEnd();
+    });
+  }
+
+  _findTouchedLetter(y) {
+    let top = y - (this.absContainerTop || 0);
+    const { alphabet } = this.state;
+
+    if (top >= 1 && top <= this.containerHeight) {
+      return alphabet[Math.round((top / this.containerHeight) * alphabet.length)];
     }
+  }
 
-    render() {
-        const {alphabet} = this.state
-        this._letters = (
-            alphabet.map((letter) => <LetterPicker letter={letter} key={letter} />)
-        );
+  _onLayout(event) {
+    this.refs.alphabetContainer.measure((x1, y1, width, height, px, py) => {
+      this.absContainerTop = py;
+      this.containerHeight = height;
+    });
+  }
 
-        return (
-            <View
-                ref='alphabetContainer'
-                {...this._panResponder.panHandlers}
-                onLayout={this._onLayout.bind(this)}
-                style={{ paddingHorizontal: 5, backgroundColor: '#fff', borderRadius: 1, justifyContent: 'center' }}>
-                <View>
-                    {this._letters}
-                </View>
-            </View>
-        );
-    }
+  renderTalkBubble() {
+    const { currentLetter, yPositiion } = this.state;
 
+    return (
+      <View
+        style={{
+          backgroundColor: 'transparent',
+          position: 'absolute',
+          left: -64,
+          top: yPositiion,
+        }}
+      >
+        <View
+          style={{
+            justifyContent: 'center',
+            padding: 10,
+            width: 50,
+            height: 50,
+            backgroundColor: 'red',
+            borderRadius: 10,
+          }}
+        >
+          <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 16, color: 'white' }}>
+            {currentLetter}
+          </Text>
+        </View>
+        <View
+          style={{
+            position: 'absolute',
+            right: -14,
+            top: 12,
+            width: 0,
+            height: 0,
+            borderTopColor: 'transparent',
+            borderTopWidth: 13,
+            borderLeftWidth: 26,
+            borderLeftColor: 'red',
+            borderBottomWidth: 13,
+            borderBottomColor: 'transparent',
+          }}
+        />
+      </View>
+    );
+  }
+
+  render() {
+    const { alphabet, currentLetter } = this.state;
+    this._letters = alphabet.map(letter => <LetterPicker letter={letter} key={letter} />);
+
+    return (
+      <View
+        ref="alphabetContainer"
+        {...this._panResponder.panHandlers}
+        onLayout={this._onLayout.bind(this)}
+        style={{
+          paddingHorizontal: 5,
+          backgroundColor: '#fff',
+          borderRadius: 1,
+          justifyContent: 'center',
+        }}
+      >
+        {!!currentLetter && this.renderTalkBubble()}
+        <View>{this._letters}</View>
+      </View>
+    );
+  }
 }

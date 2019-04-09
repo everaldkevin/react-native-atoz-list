@@ -62,6 +62,20 @@ export default class AtoZList extends Component {
 
 
   componentWillReceiveProps(nextProps) {
+	if (
+      this.props.cellHeight !== nextProps.cellHeight ||
+      this.props.sectionHeaderHeight !== nextProps.sectionHeaderHeight
+    ) {
+      this.dataSource = new FixedHeightWindowedListView.DataSource({
+        getHeightForSectionHeader: sectionId => {
+          return nextProps.sectionHeaderHeight;
+        },
+        getHeightForCell: sectionId => {
+          return nextProps.cellHeight;
+        },
+      });
+    }
+
     if(this.props.data !== nextProps.data){
       this.setState({
         dataSource: this.dataSource.cloneWithCellsAndSections(nextProps.data),
@@ -86,12 +100,12 @@ export default class AtoZList extends Component {
             dataSource={this.state.dataSource}
             renderCell={this.props.renderCell}
             renderSectionHeader={this.props.renderSection}
-            incrementDelay={16}
-            initialNumToRender={8}
-            pageSize={Platform.OS === 'ios' ? 15 : 8}
-            maxNumToRender={70}
-            numToRenderAhead={40}
-            numToRenderBehind={4}
+            incrementDelay={1}
+            initialNumToRender={12}
+            pageSize={Platform.OS === 'ios' ? 14 : 10}
+            maxNumToRender={80}
+            numToRenderAhead={60}
+            numToRenderBehind={30}
             onEndReached={this.props.onEndReached}
             onScroll={this.props.onScroll}
           />
@@ -120,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     top: 0,
     bottom: 0,
-    right: 0,
+    right: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },
