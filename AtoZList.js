@@ -92,6 +92,8 @@ export default class AtoZList extends Component {
         <AlphabetPicker
           alphabet={this.state.alphabet}
           onTouchLetter={this._onTouchLetter.bind(this)}
+          backgroundColor={this.props.backgroundColor || 'red'}
+          textColor={this.props.textColor || 'white'}
         />
       </View>
     );

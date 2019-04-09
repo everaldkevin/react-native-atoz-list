@@ -103,6 +103,7 @@ export default class AlphabetPicker extends Component {
 
   renderTalkBubble() {
     const { currentLetter, yPositiion } = this.state;
+    const { backgroundColor, textColor } = this.props;
 
     return (
       <View
@@ -119,11 +120,11 @@ export default class AlphabetPicker extends Component {
             padding: 10,
             width: 50,
             height: 50,
-            backgroundColor: 'red',
+            backgroundColor: backgroundColor,
             borderRadius: 10,
           }}
         >
-          <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 16, color: 'white' }}>
+          <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 16, color: textColor }}>
             {currentLetter}
           </Text>
         </View>
@@ -137,7 +138,7 @@ export default class AlphabetPicker extends Component {
             borderTopColor: 'transparent',
             borderTopWidth: 13,
             borderLeftWidth: 26,
-            borderLeftColor: 'red',
+            borderLeftColor: backgroundColor,
             borderBottomWidth: 13,
             borderBottomColor: 'transparent',
           }}
