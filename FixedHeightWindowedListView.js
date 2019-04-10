@@ -76,7 +76,7 @@ export default class FixedHeightWindowedListView extends Component {
     let { spacerTopHeight, spacerBottomHeight, spacerMidHeight } = this.__calculateSpacers();
 
     let rows = [];
-    rows.push(<View key="sp-top" style={{ height: spacerTopHeight }} />);
+    rows.push(<View key="sp-top" style={{ height: spacerTopHeight || 0 }} />);
 
     if (bufferFirstRow < firstRow && bufferFirstRow !== null) {
       bufferLastRow = clamp(0, bufferLastRow, firstRow - 1);
@@ -92,12 +92,12 @@ export default class FixedHeightWindowedListView extends Component {
     this.__renderCells(rows, firstRow, lastRow);
 
     if (bufferFirstRow > lastRow && bufferFirstRow !== null) {
-      rows.push(<View key="sp-mid" style={{ height: spacerMidHeight }} />);
+      rows.push(<View key="sp-mid" style={{ height: spacerMidHeight || 0 }} />);
       this.__renderCells(rows, bufferFirstRow, bufferLastRow);
     }
 
     let totalRows = this.props.dataSource.getRowCount();
-    rows.push(<View key="sp-bot" style={{ height: spacerBottomHeight }} />);
+    rows.push(<View key="sp-bot" style={{ height: spacerBottomHeight || 0 }} />);
 
     return (
       <ScrollView
