@@ -106,11 +106,11 @@ export default class AtoZList extends Component {
             dataSource={this.state.dataSource}
             renderCell={this.props.renderCell}
             renderSectionHeader={this.props.renderSection}
-            incrementDelay={16}
-            initialNumToRender={8}
+            incrementDelay={1}
+            initialNumToRender={10}
             pageSize={Platform.OS === 'ios' ? 15 : 8}
-            maxNumToRender={70}
-            numToRenderAhead={40}
+            maxNumToRender={40}
+            numToRenderAhead={20}
             numToRenderBehind={4}
             onEndReached={this.props.onEndReached}
             onScroll={this.props.onScroll}
