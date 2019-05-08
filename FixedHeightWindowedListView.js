@@ -104,9 +104,17 @@ export default class FixedHeightWindowedListView extends Component {
         scrollEventThrottle={50}
         removeClippedSubviews={this.props.numToRenderAhead === 0 ? false : true}
         automaticallyAdjustContentInsets={false}
+        showsVerticalScrollIndicator={false}
         {...this.props}
         ref={ref => {
           this.scrollRef = ref;
+        }}
+        onLayout={({
+          nativeEvent: {
+            layout: { height },
+          },
+        }) => {
+          this.height = height;
         }}
         onScroll={this.__onScroll}
       >
@@ -176,7 +184,7 @@ export default class FixedHeightWindowedListView extends Component {
                     this.isScrollingToSection = false;
                     this.__clearEnqueuedComputation();
                     this.__enqueueComputeRowsToRender();
-                  }, 100);
+                  }, 250);
                 }
               }
             );
@@ -185,7 +193,7 @@ export default class FixedHeightWindowedListView extends Component {
       );
 
       // Scroll to the buffer area as soon as setState is complete
-      this.scrollRef.scrollTo({ y: startY, animated: false });
+      this.scrollWithoutAnimationTo(startY + 1, 0);
       //  this.scrollRef.scrollTo({x: 0, y: startY, animation: false});
     } else {
       this.nextSectionToScrollTo = sectionId; // Only keep the most recent value
@@ -250,6 +258,7 @@ export default class FixedHeightWindowedListView extends Component {
   __onScroll(e) {
     this.prevScrollOffsetY = this.scrollOffsetY || 0;
     this.scrollOffsetY = e.nativeEvent.contentOffset.y;
+
     this.scrollDirection = this.__getScrollDirection();
     this.height = e.nativeEvent.layoutMeasurement.height;
     this.__enqueueComputeRowsToRender();
