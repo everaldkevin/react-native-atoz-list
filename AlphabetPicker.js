@@ -49,8 +49,8 @@ export default class AlphabetPicker extends Component {
         clearTimeout(this.tapTimeout);
 
         const { alphabet } = this.state;
-
         const letter = this._findTouchedLetter(gestureState.moveY);
+
         if (!!letter) {
           let top = gestureState.moveY - (this.absContainerTop || 0);
           top =
