@@ -15,7 +15,6 @@ import invariant from 'fbjs/lib/invariant';
  *
  */
 class FixedHeightListViewDataSource {
-
   constructor(params) {
     this._dataSource = [];
     this._lookup = {};
@@ -38,24 +37,24 @@ class FixedHeightListViewDataSource {
 
     invariant(
       numToRenderAhead < maxNumToRender,
-      `numToRenderAhead must be less than maxNumToRender`,
+      `numToRenderAhead must be less than maxNumToRender`
     );
 
     let numRendered = lastRendered - firstRendered + 1;
-    let lastRow, targetLastRow, firstRow, targetFirstRow;
+    let targetLastRow, firstRow, lastRow, targetFirstRow;
 
     if (scrollDirection === 'down') {
-      let lastResult = this.__computeLastRow({numRendered, ...options});
+      let lastResult = this.__computeLastRow({ numRendered, ...options });
       lastRow = lastResult.lastRow;
       targetLastRow = lastResult.targetLastRow;
-      let firstResult = this.__computeFirstRow({lastRow, numRendered, ...options});
+      let firstResult = this.__computeFirstRow({ lastRow, numRendered, ...options });
       firstRow = firstResult.firstRow;
       targetFirstRow = firstResult.targetFirstRow;
     } else if (scrollDirection === 'up') {
-      let firstResult = this.__computeFirstRow({numRendered, ...options});
+      let firstResult = this.__computeFirstRow({ numRendered, ...options });
       firstRow = firstResult.firstRow;
       targetFirstRow = firstResult.targetFirstRow;
-      let lastResult = this.__computeLastRow({firstRow, numRendered, ...options});
+      let lastResult = this.__computeLastRow({ firstRow, numRendered, ...options });
       lastRow = lastResult.lastRow;
       targetLastRow = lastResult.targetLastRow;
     }
@@ -83,18 +82,15 @@ class FixedHeightListViewDataSource {
       targetFirstRow = firstRow = Math.max(
         0,
         firstVisible - numToRenderBehind, // Never hide the first visible row
-        lastRow - maxNumToRender,         // Don't exceed max to render
+        lastRow - maxNumToRender // Don't exceed max to render
       );
     } else if (scrollDirection === 'up') {
       targetFirstRow = Math.max(
         0, // Don't render past the top
-        firstVisible - numToRenderAhead + numToRenderBehind, // Primary goal -- this is what we need lastVisible for
+        firstVisible - numToRenderAhead + numToRenderBehind // Primary goal -- this is what we need lastVisible for
       );
 
-      firstRow = Math.max(
-        targetFirstRow,
-        firstRendered - pageSize,
-      );
+      firstRow = Math.max(targetFirstRow, firstRendered - pageSize);
     }
 
     return { firstRow, targetFirstRow };
@@ -121,17 +117,14 @@ class FixedHeightListViewDataSource {
       targetLastRow = Math.min(
         totalRows - 1, // Don't render past the bottom
         lastVisible + numToRenderAhead - numToRenderBehind, // Primary goal -- this is what we need lastVisible for
-        firstVisible + numRendered + numToRenderAhead - numToRenderBehind, // But don't exceed num to render ahead
+        firstVisible + numRendered + numToRenderAhead - numToRenderBehind // But don't exceed num to render ahead
       );
 
-      lastRow = Math.min(
-        targetLastRow,
-        lastRendered + pageSize,
-      );
+      lastRow = Math.min(targetLastRow, lastRendered + pageSize);
     } else if (scrollDirection === 'up') {
       targetLastRow = lastRow = lastRendered;
 
-      let numToBeRendered = (lastRendered - firstRow);
+      let numToBeRendered = lastRendered - firstRow;
       if (numToBeRendered > maxNumToRender) {
         targetLastRow = lastRow = targetLastRow - (numToBeRendered - maxNumToRender);
       }
@@ -154,7 +147,7 @@ class FixedHeightListViewDataSource {
     _.forEach(this._lookup, (section, sectionId) => {
       if (i > section.range[0] && i <= section.range[1]) {
         height += section.sectionHeaderHeight;
-        height += ((i - 1) - section.range[0]) * section.cellHeight;
+        height += (i - 1 - section.range[0]) * section.cellHeight;
       } else if (section.range[0] < i) {
         height += section.height;
       }
@@ -168,6 +161,8 @@ class FixedHeightListViewDataSource {
   }
 
   getFirstRowOfSection(sectionId) {
+    // console.log(this._lookup[sectionId]);
+
     let range = this._lookup[sectionId].range;
     let startY = this._lookup[sectionId].startY;
 
@@ -183,6 +178,7 @@ class FixedHeightListViewDataSource {
   getHeightBetweenRows(i, ii) {
     if (ii < i) {
       console.warn('provide the lower index first');
+      return;
     }
 
     return this.getHeightBeforeRow(ii) - this.getHeightBeforeRow(i + 1);
@@ -196,11 +192,7 @@ class FixedHeightListViewDataSource {
    * Returns the height of spacer after the last rendered row.
    */
   getHeightAfterRow(i) {
-    return (
-      this.getTotalHeight() -
-      this.getHeightBeforeRow(i) -
-      this.getRowHeight(i)
-    );
+    return this.getTotalHeight() - this.getHeightBeforeRow(i) - this.getRowHeight(i);
   }
 
   /**
@@ -250,7 +242,7 @@ class FixedHeightListViewDataSource {
       return Math.max(this.getRowCount() - 1, 0);
     }
 
-    let parentSection = _.find(this._lookup, (value) => {
+    let parentSection = _.find(this._lookup, value => {
       return scrollY >= value.startY && scrollY <= value.endY;
     });
 
@@ -259,9 +251,8 @@ class FixedHeightListViewDataSource {
     if (relativeY <= parentSection.sectionHeaderHeight) {
       return parentSection.range[0];
     } else {
-      let i = Math.round(
-        (relativeY - parentSection.sectionHeaderHeight) /
-        parentSection.cellHeight
+      let i = Math.floor(
+        (relativeY - parentSection.sectionHeaderHeight) / parentSection.cellHeight
       );
       return parentSection.range[0] + i;
     }
@@ -294,7 +285,7 @@ class FixedHeightListViewDataSource {
   }
 
   getParentSection(i) {
-    return _.find(this._lookup, (section) => {
+    return _.find(this._lookup, section => {
       return i >= section.range[0] && i <= section.range[1];
     });
   }
@@ -320,7 +311,7 @@ class FixedHeightListViewDataSource {
     this._dataSource = [];
     let sectionIdsPresent = [];
 
-    sectionIds.forEach((sectionId) => {
+    sectionIds.forEach(sectionId => {
       if (dataBlob[sectionId]) {
         this._dataSource.push({ sectionId }, ...dataBlob[sectionId]);
         sectionIdsPresent.push(sectionId);
@@ -340,7 +331,7 @@ class FixedHeightListViewDataSource {
       let sectionHeight = sectionHeaderHeight + cellHeight * count;
 
       result[sectionId] = {
-        count: count + 1,                          // Factor in section header
+        count: count + 1, // Factor in section header
         range: [lastRow + 1, lastRow + 1 + count], // Move 1 ahead of previous last row
         height: sectionHeight,
         startY: cumulativeHeight,
