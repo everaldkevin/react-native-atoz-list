@@ -281,7 +281,10 @@ class FixedHeightListViewDataSource {
   }
 
   getSectionId(i) {
-    return this.getParentSection(i).sectionId;
+    let parentSection = this.getParentSection(i);
+    if (parentSection) {
+      return parentSection.sectionId;
+    }
   }
 
   getParentSection(i) {
