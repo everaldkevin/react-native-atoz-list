@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 class LetterPicker extends Component {
   render() {
-    return <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{this.props.letter}</Text>;
+    return <Text style={{ fontSize: 10, fontWeight: 'bold' }}>{this.props.letter}</Text>;
   }
 }
 
