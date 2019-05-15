@@ -308,18 +308,14 @@ export default class FixedHeightWindowedListView extends Component {
    * the viewport.
    */
   __computeRowsToRenderSync(props, forceUpdate = false) {
-    if (
-      this.props.bufferFirstRow === 0 ||
-      this.props.bufferFirstRow > 0 ||
-      this.isScrollingToSection
-    ) {
+    if (props.bufferFirstRow === 0 || props.bufferFirstRow > 0 || this.isScrollingToSection) {
       requestAnimationFrame(() => {
-        this.__computeRowsToRenderSync(this.props);
+        this.__computeRowsToRenderSync(props);
       });
       return;
     }
 
-    let { dataSource } = this.props;
+    let { dataSource } = props;
     let totalRows = dataSource.getRowCount();
 
     if (totalRows === 0) {
@@ -327,7 +323,7 @@ export default class FixedHeightWindowedListView extends Component {
       return;
     }
 
-    if (this.props.numToRenderAhead === 0) {
+    if (props.numToRenderAhead === 0) {
       return;
     }
 
@@ -340,7 +336,7 @@ export default class FixedHeightWindowedListView extends Component {
       return;
     }
 
-    let scrollDirection = this.props.isTouchingSectionPicker ? 'down' : this.scrollDirection;
+    let scrollDirection = props.isTouchingSectionPicker ? 'down' : this.scrollDirection;
 
     let { firstRow, lastRow, targetFirstRow, targetLastRow } = dataSource.computeRowsToRender({
       scrollDirection,
