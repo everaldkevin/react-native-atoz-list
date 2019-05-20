@@ -310,7 +310,7 @@ export default class FixedHeightWindowedListView extends Component {
   __computeRowsToRenderSync(props, forceUpdate = false) {
     if (props.bufferFirstRow === 0 || props.bufferFirstRow > 0 || this.isScrollingToSection) {
       requestAnimationFrame(() => {
-        this.__computeRowsToRenderSync(props);
+        this.__computeRowsToRenderSync(props, forceUpdate);
       });
       return;
     }
