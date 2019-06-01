@@ -61,7 +61,7 @@ export default class FixedHeightWindowedListView extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.__computeRowsToRenderSync(nextProps, true);
+    this.__computeRowsToRenderSync(nextProps, true, true);
   }
 
   componentWillUnmount() {
@@ -307,10 +307,10 @@ export default class FixedHeightWindowedListView extends Component {
    * The result of this is an up-to-date state of firstRow and lastRow, given
    * the viewport.
    */
-  __computeRowsToRenderSync(props, forceUpdate = false) {
+  __computeRowsToRenderSync(props, forceUpdate = false, isUpdate = false) {
     if (props.bufferFirstRow === 0 || props.bufferFirstRow > 0 || this.isScrollingToSection) {
       requestAnimationFrame(() => {
-        this.__computeRowsToRenderSync(props, forceUpdate);
+        this.__computeRowsToRenderSync(props, forceUpdate, isUpdate);
       });
       return;
     }
@@ -336,7 +336,7 @@ export default class FixedHeightWindowedListView extends Component {
       return;
     }
 
-    let scrollDirection = props.isTouchingSectionPicker ? 'down' : this.scrollDirection;
+    let scrollDirection = props.isTouchingSectionPicker || isUpdate ? 'down' : this.scrollDirection;
 
     let { firstRow, lastRow, targetFirstRow, targetLastRow } = dataSource.computeRowsToRender({
       scrollDirection,
