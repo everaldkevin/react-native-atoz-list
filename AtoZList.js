@@ -27,13 +27,14 @@ import AlphabetPicker from './AlphabetPicker';
 
 export default class AtoZList extends Component {
   static propTypes = {
-    sectionHeaderHeight: PropTypes.number.isRequired,
     cellHeight: PropTypes.number.isRequired,
     data: PropTypes.object.isRequired,
-    renderCell: PropTypes.func,
-    renderSection: PropTypes.func,
+    hideAlphabetInstance: PropTypes.bool,
     onEndReached: PropTypes.func,
     onScroll: PropTypes.func,
+    renderCell: PropTypes.func,
+    renderSection: PropTypes.func,
+    sectionHeaderHeight: PropTypes.number.isRequired,
   };
 
   constructor(props, context) {
@@ -87,6 +88,8 @@ export default class AtoZList extends Component {
   }
 
   render() {
+    const { hideAlphabetInstance } = this.props;
+    
     this._alphabetInstance = (
       <View style={styles.alphabetSidebar}>
         <AlphabetPicker
@@ -116,7 +119,7 @@ export default class AtoZList extends Component {
             onScroll={this.props.onScroll}
           />
         </View>
-        {this._alphabetInstance}
+        {!hideAlphabetInstance && this._alphabetInstance}
       </View>
     );
   }
@@ -135,10 +138,8 @@ const styles = StyleSheet.create({
   alphabetSidebar: {
     position: 'absolute',
     backgroundColor: 'transparent',
-    top: 0,
+    top: 32,
     bottom: 0,
     right: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
