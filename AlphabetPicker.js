@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 class LetterPicker extends Component {
   render() {
-    return <Text style={{ fontSize: 12, fontWeight: 'bold' }}>{this.props.letter}</Text>;
+    return <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: this.props.space }}>{this.props.letter}</Text>;
   }
 }
 
@@ -149,7 +149,21 @@ export default class AlphabetPicker extends Component {
 
   render() {
     const { alphabet, currentLetter } = this.state;
-    this._letters = alphabet.map(letter => <LetterPicker letter={letter} key={letter} />);
+    //1-5
+    let space = 2.75;
+    // 6-10
+    if (alphabet.length > 5 && alphabet.length <= 10)
+      space = 2.5
+    else if (alphabet.length > 10 && alphabet.length <= 15)
+      space = 2
+    // 16-23
+    else if(alphabet.length > 15 && alphabet.length <= 23)
+      space = 1.75
+    // >24
+    else if(alphabet.length > 23 )
+      space = 1.5
+
+    this._letters = alphabet.map(letter => <LetterPicker letter={letter} space={space} key={letter} />);
 
     return (
       <View
