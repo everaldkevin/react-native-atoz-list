@@ -150,18 +150,18 @@ export default class AlphabetPicker extends Component {
   render() {
     const { alphabet, currentLetter } = this.state;
     //1-5
-    let space = 2.75;
+    let space = 3.25;
     // 6-10
     if (alphabet.length > 5 && alphabet.length <= 10)
-      space = 2.5
+      space = 3
     else if (alphabet.length > 10 && alphabet.length <= 15)
-      space = 2
+      space = 2.75
     // 16-23
     else if(alphabet.length > 15 && alphabet.length <= 23)
-      space = 1.75
+      space = 2.5
     // >24
     else if(alphabet.length > 23 )
-      space = 1.5
+      space = 2.25
 
     this._letters = alphabet.map(letter => <LetterPicker letter={letter} space={space} key={letter} />);
 
